@@ -2,61 +2,40 @@ package repository;
 
 import model.Post;
 
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Optional;
-import java.util.concurrent.atomic.AtomicInteger;
+import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.atomic.AtomicLong;
 
 public class PostRepository {
 
-    private final AtomicInteger countPosts = new AtomicInteger(1);
+    AtomicLong countPosts =  new AtomicLong(0);
 
-    private final List<Post> posts = new LinkedList<>();
+    private final Map<Long, Post> posts = new ConcurrentHashMap<>();
 
     public synchronized List<Post> all() {
-        return posts;
+        return new ArrayList<>(posts.values());
     }
 
     public Optional<Post> getById(long id) {
-        Post post = null;
-        synchronized (posts) {
-            for (Post p : posts) {
-                if (p.getId() == id) {
-                    post = p;
-                    break;
-                }
-            }
-        }
-        return Optional.ofNullable(post);
+        return Optional.ofNullable(posts.get(id));
     }
 
     public Post save(Post post) {
-        if (post.getId() == 0) {
-            synchronized (posts) {
-                posts.add(new Post(countPosts.getAndIncrement(), post.getContent()));
+        synchronized (posts) {
+            long id = post.getId();
+            if (posts.containsKey(id)) {
+                posts.put(id, new Post(id, post.getContent()));
+            } else {
+                countPosts.getAndIncrement();
+                posts.put(countPosts.get(), new Post(countPosts.get(), post.getContent()));
             }
             return post;
         }
-        Post existingPost;
-        if (getById(post.getId()).isPresent()) {
-            existingPost = getById(post.getId()).get();
-            synchronized (posts) {
-                int index = posts.indexOf(existingPost);
-                posts.set(index, post);
-            }
-        } else {
-            synchronized (posts) {
-                posts.add(post);
-            }
-        }
-        return post;
     }
 
     public void removeById(long id) {
         if (getById(id).isPresent()) {
-            synchronized (posts) {
-                posts.remove(getById(id).get());
-            }
+            posts.remove(id);
         }
     }
 }
