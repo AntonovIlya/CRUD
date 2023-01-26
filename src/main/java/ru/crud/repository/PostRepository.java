@@ -1,11 +1,13 @@
-package repository;
+package ru.crud.repository;
 
-import model.Post;
+import org.springframework.stereotype.Repository;
+import ru.crud.model.Post;
 
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicLong;
 
+@Repository
 public class PostRepository {
 
     AtomicLong countPosts =  new AtomicLong(0);

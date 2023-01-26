@@ -1,11 +1,13 @@
-package service;
+package ru.crud.service;
 
-import exception.NotFoundException;
-import model.Post;
-import repository.PostRepository;
+import org.springframework.stereotype.Service;
+import ru.crud.exception.NotFoundException;
+import ru.crud.model.Post;
+import ru.crud.repository.PostRepository;
 
 import java.util.List;
 
+@Service
 public class PostService {
     private final PostRepository repository;
 
