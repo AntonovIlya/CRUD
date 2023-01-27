@@ -8,11 +8,16 @@ import java.util.concurrent.atomic.AtomicLong;
 
 public class PostRepository {
 
-    AtomicLong countPosts =  new AtomicLong(0);
+    private final AtomicLong countPosts;
 
-    private final Map<Long, Post> posts = new ConcurrentHashMap<>();
+    private final Map<Long, Post> posts;
 
-    public synchronized List<Post> all() {
+    public PostRepository() {
+        countPosts = new AtomicLong(0);
+        posts = new ConcurrentHashMap<>();
+    }
+
+    public List<Post> all() {
         return new ArrayList<>(posts.values());
     }
 
@@ -21,21 +26,17 @@ public class PostRepository {
     }
 
     public Post save(Post post) {
-        synchronized (posts) {
-            long id = post.getId();
-            if (posts.containsKey(id)) {
-                posts.put(id, new Post(id, post.getContent()));
-            } else {
-                countPosts.getAndIncrement();
-                posts.put(countPosts.get(), new Post(countPosts.get(), post.getContent()));
-            }
-            return post;
+        long id = post.getId();
+        if (posts.containsKey(id)) {
+            posts.put(id, new Post(id, post.getContent()));
+        } else {
+            countPosts.getAndIncrement();
+            posts.put(countPosts.get(), new Post(countPosts.get(), post.getContent()));
         }
+        return post;
     }
 
     public void removeById(long id) {
-        if (getById(id).isPresent()) {
-            posts.remove(id);
-        }
+        posts.remove(id);
     }
 }
