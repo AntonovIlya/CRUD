@@ -1,8 +1,7 @@
-package servlet;
+package ru.crud.servlet;
 
-import config.JavaConfig;
-import controller.PostController;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
+import ru.crud.controller.PostController;
 
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
@@ -23,7 +22,7 @@ public class MainServlet extends HttpServlet {
 
     @Override
     public void init() {
-        final var context = new AnnotationConfigApplicationContext(JavaConfig.class);
+        final var context = new AnnotationConfigApplicationContext("ru.crud");
         controller = context.getBean(PostController.class);
     }
 
