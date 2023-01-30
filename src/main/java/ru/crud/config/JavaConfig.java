@@ -1,10 +1,10 @@
-package config;
+package ru.crud.config;
 
-import controller.PostController;
+import ru.crud.controller.PostController;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import repository.PostRepository;
-import service.PostService;
+import ru.crud.repository.PostRepository;
+import ru.crud.service.PostService;
 
 @Configuration
 public class JavaConfig {
