@@ -5,15 +5,15 @@
          version="4.0">
   <response-character-encoding>UTF-8</response-character-encoding>
   <!-- определение ru.crud.servlet'а -->
-  <servlet>
+  <!--<servlet>
     <servlet-name>main</servlet-name>
     <servlet-class>ru.crud.servlet.MainServlet</servlet-class>
     <load-on-startup>1</load-on-startup>
   </servlet>
 
-  <!-- mapping - привязка к определённому URL-->
+  &lt;!&ndash; mapping - привязка к определённому URL&ndash;&gt;
   <servlet-mapping>
     <servlet-name>main</servlet-name>
     <url-pattern>/</url-pattern>
-  </servlet-mapping>
+  </servlet-mapping>-->
 </web-app>
