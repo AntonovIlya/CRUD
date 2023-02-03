@@ -1,6 +1,8 @@
 package ru.crud.repository;
 
 import org.springframework.stereotype.Repository;
+import ru.crud.exception.NotFoundException;
+import ru.crud.model.AdapterPost;
 import ru.crud.model.Post;
 
 import java.util.*;
@@ -12,7 +14,7 @@ public class PostRepository {
 
     private final AtomicLong countPosts;
 
-    private final Map<Long, Post> posts;
+    private final Map<Long, AdapterPost> posts;
 
     public PostRepository() {
         countPosts = new AtomicLong(0);
@@ -20,25 +22,36 @@ public class PostRepository {
     }
 
     public List<Post> all() {
-        return new ArrayList<>(posts.values());
+        return posts.values().stream()
+                .filter(adapterPost -> !adapterPost.isRemoved())
+                .map(AdapterPost::getPost)
+                .toList();
     }
 
     public Optional<Post> getById(long id) {
-        return Optional.ofNullable(posts.get(id));
+        if (posts.containsKey(id)) {
+            Post post = !posts.get(id).isRemoved() ? posts.get(id).getPost() : null;
+            return Optional.ofNullable(post);
+        }
+        return Optional.empty();
     }
 
     public Post save(Post post) {
         long id = post.getId();
         if (posts.containsKey(id)) {
-            posts.put(id, new Post(id, post.getContent()));
+            if (posts.get(id).isRemoved()) throw new NotFoundException();
+            posts.put(id, new AdapterPost(new Post(id, post.getContent())));
+            return post;
         } else {
             countPosts.getAndIncrement();
-            posts.put(countPosts.get(), new Post(countPosts.get(), post.getContent()));
+            posts.put(countPosts.get(), new AdapterPost(new Post(countPosts.get(), post.getContent())));
+            return posts.get(countPosts.get()).getPost();
         }
-        return post;
     }
 
     public void removeById(long id) {
-        posts.remove(id);
+        if (posts.containsKey(id)) {
+            posts.get(id).setRemoved(true);
+        }
     }
 }
